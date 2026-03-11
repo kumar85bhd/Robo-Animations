@@ -2,19 +2,22 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 export type RobotVariant = 'idle' | 'blinking' | 'talking' | 'scanning' | 'glitch' | 'wave' | 'hover' | 'hologram' | 'charging' | 'alert' | 'walking' | 'dancing';
+export type RobotModel = 'premium' | 'mascot' | 'classic';
 
 interface RobotAnimationProps {
   scale?: number;
   className?: string;
   color?: string;
   variant?: RobotVariant;
+  model?: RobotModel;
 }
 
 const RobotAnimation: React.FC<RobotAnimationProps> = ({
   scale = 1,
   className = '',
   color = 'indigo',
-  variant = 'idle'
+  variant = 'idle',
+  model = 'premium'
 }) => {
   // Color mapping
   const getColorStyles = (color: string) => {
@@ -55,14 +58,23 @@ const RobotAnimation: React.FC<RobotAnimationProps> = ({
         beam: 'bg-orange-400/50',
         antenna: 'bg-orange-400',
       },
-      'red': {
-        aura: 'bg-red-500/20',
-        eye: 'bg-red-500',
-        eyeShadow: 'shadow-[0_0_15px_rgba(239,68,68,0.8)]',
-        chest: 'bg-red-500',
-        chestShadow: 'shadow-[0_0_20px_rgba(239,68,68,0.8)]',
-        beam: 'bg-red-500/50',
-        antenna: 'bg-red-500',
+      'blue': {
+        aura: 'bg-blue-500/20',
+        eye: 'bg-blue-400',
+        eyeShadow: 'shadow-[0_0_15px_rgba(96,165,250,0.8)]',
+        chest: 'bg-blue-400',
+        chestShadow: 'shadow-[0_0_20px_rgba(96,165,250,0.8)]',
+        beam: 'bg-blue-400/50',
+        antenna: 'bg-blue-400',
+      },
+      'pink': {
+        aura: 'bg-pink-500/20',
+        eye: 'bg-pink-400',
+        eyeShadow: 'shadow-[0_0_15px_rgba(244,114,182,0.8)]',
+        chest: 'bg-pink-400',
+        chestShadow: 'shadow-[0_0_20px_rgba(244,114,182,0.8)]',
+        beam: 'bg-pink-400/50',
+        antenna: 'bg-pink-400',
       }
     };
     if (variant === 'alert') return styles['red'];
@@ -70,6 +82,22 @@ const RobotAnimation: React.FC<RobotAnimationProps> = ({
   };
 
   const styles = getColorStyles(color);
+
+  // Helper for classic model border-based eyes
+  const getClassicEyeStyles = (color: string) => {
+    const styles: Record<string, string> = {
+      'indigo': 'border-cyan-400 drop-shadow-[0_0_10px_rgba(34,211,238,0.8)]',
+      'fuchsia': 'border-fuchsia-400 drop-shadow-[0_0_10px_rgba(232,121,249,0.8)]',
+      'emerald': 'border-emerald-400 drop-shadow-[0_0_10px_rgba(52,211,153,0.8)]',
+      'orange': 'border-orange-400 drop-shadow-[0_0_10px_rgba(251,146,60,0.8)]',
+      'red': 'border-red-500 drop-shadow-[0_0_10px_rgba(239,68,68,0.8)]',
+      'blue': 'border-blue-400 drop-shadow-[0_0_10px_rgba(96,165,250,0.8)]',
+      'pink': 'border-pink-400 drop-shadow-[0_0_10px_rgba(244,114,182,0.8)]',
+    };
+    return styles[color] || styles['indigo'];
+  };
+
+  const classicEyeStyle = getClassicEyeStyles(color);
 
   // Animations
   const getEyeAnimation = () => {
@@ -286,6 +314,189 @@ const RobotAnimation: React.FC<RobotAnimationProps> = ({
   };
 
   const isHologram = variant === 'hologram';
+
+  if (model === 'mascot') {
+    const getMascotBodyAnimation = () => {
+      if (variant === "hover" || variant === "hologram") {
+        return {
+          y: [-15, 15, -15],
+          transition: { duration: 3, repeat: Infinity, ease: "easeInOut" }
+        };
+      }
+      return {
+        y: [-8, 8, -8],
+        transition: { duration: 4, repeat: Infinity, ease: "easeInOut" }
+      };
+    };
+
+    const getMascotWaveAnimation = () => {
+      if (variant === "wave") {
+        return {
+          rotate: [0, 30, -10, 30, 0],
+          transition: { duration: 1.2, repeat: Infinity }
+        };
+      }
+      return {};
+    };
+
+    return (
+      <div className={`flex items-center justify-center relative ${className}`}>
+        {/* Aura Glow */}
+        <motion.div
+          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+          className={`absolute w-64 h-64 rounded-full blur-[70px] ${styles.aura}`}
+        />
+
+        <motion.div
+          animate={getMascotBodyAnimation()}
+          style={{ transform: `scale(${scale})` }}
+          className={`relative flex flex-col items-center ${isHologram ? 'mix-blend-screen opacity-70' : ''}`}
+        >
+          {isHologram && (
+            <motion.div 
+              animate={{ opacity: [0, 0.15, 0], y: [-150, 150] }} 
+              transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }}
+              className="absolute inset-0 bg-cyan-400/20 z-50 pointer-events-none rounded-full"
+              style={{ mixBlendMode: 'overlay' }}
+            />
+          )}
+
+          {/* Head */}
+          <div className="relative w-44 h-36 bg-gradient-to-b from-slate-100 to-slate-300 rounded-[2.5rem] shadow-xl flex items-center justify-center z-30 border border-white/40">
+            {/* Screen */}
+            <div className="w-[86%] h-[82%] bg-slate-900 rounded-[2rem] flex flex-col items-center justify-center border-2 border-slate-700/50 relative overflow-hidden">
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[150%] h-[55%] bg-gradient-to-b from-white/10 to-transparent rounded-b-[100%] pointer-events-none" />
+              
+              {/* Eyes */}
+              <div className="flex gap-6 mb-3">
+                <motion.div
+                  animate={getEyeAnimation()}
+                  className={`w-7 h-4 rounded-full ${styles.eye} ${styles.eyeShadow}`}
+                />
+                <motion.div
+                  animate={getEyeAnimation()}
+                  className={`w-7 h-4 rounded-full ${styles.eye} ${styles.eyeShadow}`}
+                />
+              </div>
+
+              {/* Scanning Beam */}
+              {variant === 'scanning' && (
+                <motion.div
+                  animate={{ x: [-50, 50, -50] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                  className={`absolute w-6 h-full ${styles.beam} blur-md top-0`}
+                />
+              )}
+
+              {/* Mouth */}
+              <motion.div
+                animate={getMouthAnimation()}
+                className={`rounded-full opacity-90 ${styles.eye} ${styles.eyeShadow}`}
+              />
+            </div>
+          </div>
+
+          {/* Body */}
+          <div className="w-32 h-28 bg-gradient-to-b from-slate-200 to-slate-400 rounded-[50%] shadow-lg -mt-4 flex items-center justify-center z-20 border border-slate-300">
+            {/* Reactor */}
+            <motion.div
+              animate={getChestAnimation()}
+              className={`w-8 h-8 rounded-full ${styles.chest} ${styles.chestShadow}`}
+            />
+          </div>
+
+          {/* Arms */}
+          <div className="absolute flex justify-between w-56 top-32 z-10">
+            <motion.div
+              animate={getMascotWaveAnimation()}
+              style={{ transformOrigin: "top center" }}
+              className="w-6 h-20 bg-gradient-to-b from-slate-200 to-slate-400 rounded-full shadow border border-slate-300"
+            />
+            <motion.div 
+              animate={variant === 'dancing' ? { rotate: [0, -30, 0], y: [0, -10, 0] } : {}}
+              transition={{ duration: 0.5, repeat: Infinity }}
+              className="w-6 h-20 bg-gradient-to-b from-slate-200 to-slate-400 rounded-full shadow border border-slate-300" 
+            />
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
+  if (model === 'classic') {
+    return (
+      <div className={`flex items-center justify-center relative ${className}`}>
+        {/* Glowing Aura */}
+        <motion.div
+          animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.6, 0.3] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+          className={`absolute w-56 h-56 rounded-full blur-[50px] ${styles.aura}`}
+        />
+
+        {/* Robot Composition */}  
+        <motion.div   
+          animate={getBodyAnimation()}  
+          className={`relative w-56 h-56 flex items-center justify-center ${isHologram ? 'mix-blend-screen' : ''}`}  
+        >  
+          {/* Robot Character */}  
+          <div className="relative z-10 flex flex-col items-center transform" style={{ transform: `scale(${scale})` }}>  
+            {/* Head */}  
+            <div className="relative w-40 h-32 bg-gradient-to-b from-slate-100 to-slate-300 rounded-[2.5rem] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] border border-slate-100 flex items-center justify-center z-20">  
+              {/* Face Screen */}  
+              <div className="w-[88%] h-[82%] bg-slate-950 rounded-[2rem] relative overflow-hidden shadow-inner flex flex-col items-center justify-center border border-slate-800">  
+                {/* Screen Gloss */}  
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120%] h-1/2 bg-gradient-to-b from-white/10 to-transparent rounded-b-full opacity-50" />  
+                  
+                {/* Eyes */}  
+                <div className="flex gap-6 mb-2">  
+                  <motion.div   
+                    initial={{ scaleY: 0.1 }}  
+                    animate={getEyeAnimation()}  
+                    className={`w-8 h-4 border-t-[5px] rounded-t-full ${classicEyeStyle}`}  
+                  />  
+                  <motion.div   
+                    initial={{ scaleY: 0.1 }}  
+                    animate={getEyeAnimation()}  
+                    className={`w-8 h-4 border-t-[5px] rounded-t-full ${classicEyeStyle}`}  
+                  />  
+                </div>  
+                  
+                {/* Scanning Beam (Only for scanning variant) */}  
+                {variant === 'scanning' && (  
+                  <motion.div  
+                    animate={{ x: [-60, 60, -60] }}  
+                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}  
+                    className="absolute w-2 h-full bg-cyan-400/50 blur-md top-0"  
+                  />  
+                )}  
+
+                {/* Smile */}  
+                <motion.div   
+                    animate={getMouthAnimation()}  
+                    className={`w-4 h-2 border-b-[3px] rounded-b-full opacity-80 border-cyan-400`}  
+                />  
+              </div>  
+
+              {/* Ears */}  
+              <div className="absolute -left-4 top-1/2 -translate-y-1/2 w-6 h-16 bg-gradient-to-r from-slate-300 to-slate-100 rounded-2xl shadow-md -z-10 border-l border-slate-300" />  
+              <div className="absolute -right-4 top-1/2 -translate-y-1/2 w-6 h-16 bg-gradient-to-l from-slate-300 to-slate-100 rounded-2xl shadow-md -z-10 border-r border-slate-300" />  
+            </div>  
+
+            {/* Body */}  
+            <div className="relative -mt-4 w-28 h-20 bg-gradient-to-b from-slate-200 to-slate-400 rounded-[2rem] shadow-xl z-10 flex items-center justify-center border-t border-slate-300">  
+              <div className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center border border-slate-600">  
+                  <motion.div   
+                    animate={getChestAnimation()}  
+                    className={`w-4 h-4 rounded-full shadow-[0_0_10px_rgba(34,211,238,0.8)] ${variant !== 'charging' ? 'animate-pulse' : ''} ${styles.chest}`}   
+                  />  
+              </div>  
+            </div>  
+          </div>  
+        </motion.div>  
+      </div>
+    );
+  }
 
   return (
     <div className={`flex items-center justify-center relative ${className}`}>
