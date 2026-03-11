@@ -1,0 +1,5 @@
+{
+  "name": "Robot Animator",
+  "description": "An interactive showcase of a customizable, animated robot component built with React and Framer Motion.",
+  "requestFramePermissions": []
+}
